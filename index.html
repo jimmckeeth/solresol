@@ -636,11 +636,15 @@ function loadPrefs(){
 // ─────────────────────────────────────────────────────────────────────────────
 // TRANSLATE (real-time, debounced)
 // ─────────────────────────────────────────────────────────────────────────────
-let translateTimer=null;
+let translateTimer = null;
+let lastTranslatedText = '';
+
 function runTranslate(){
+  clearTimeout(translateTimer);
+  translateTimer = null;
   const text = document.getElementById('engInput').value.trim();
-  // Stop playback; buildPhrase/buildStaff do a full innerHTML rebuild so
-  // there's no need to deactivate individual old DOM nodes first.
+  lastTranslatedText = text;
+
   clearTimeout(timer);
   playing  = false;
   document.body.classList.remove('playing');
@@ -649,25 +653,29 @@ function runTranslate(){
 
   PHRASE = text ? translate(text) : [];
   buildPhrase();
-  buildStaff();  // rebuilds SEQ
+  buildStaff();   // rebuilds SEQ
 
-  // Reset position AFTER SEQ is rebuilt
   cur = -1;  curWord = -1;
   const ph = document.getElementById('playhead');
   if (ph) ph.setAttribute('opacity', '0');
 
   savePrefs();
 }
+
 function scheduleTranslate(){
   clearTimeout(translateTimer);
-  translateTimer=setTimeout(runTranslate, 320);
+  // Never interrupt active playback with a rebuild
+  if (!playing) translateTimer = setTimeout(runTranslate, 320);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EVENTS
 // ─────────────────────────────────────────────────────────────────────────────
 document.getElementById('playBtn').addEventListener('click', async e=>{
-  e.stopPropagation(); await ensureAudio(); togglePlay();
+  e.stopPropagation();
+  clearTimeout(translateTimer);
+  if(document.getElementById('engInput').value.trim() !== lastTranslatedText) runTranslate();
+  await ensureAudio(); togglePlay();
 });
 document.getElementById('resetBtn').addEventListener('click', e=>{ e.stopPropagation(); doReset(); });
 document.getElementById('engInput').addEventListener('input', scheduleTranslate);
