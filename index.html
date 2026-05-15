@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Solresol Visualizer</title>
+<script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -389,6 +390,20 @@ let timer    = null;
 function bpm()      { return parseInt(document.getElementById('tempo').value); }
 function noteDur()  { return 60000 / bpm(); }
 
+// ── Audio ──────────────────────────────────────────────────────────────────
+const NOTE_PITCH = { Do:'C4', Re:'D4', Mi:'E4', Fa:'F4', Sol:'G4', La:'A4', Si:'B4' };
+
+const reverb = new Tone.Reverb({ decay: 2, wet: 0.25 }).toDestination();
+const synth  = new Tone.Synth({
+  oscillator: { type: 'triangle8' },
+  envelope:   { attack: 0.01, decay: 0.4, sustain: 0.15, release: 1.4 },
+}).connect(reverb);
+
+let audioReady = false;
+async function ensureAudio() {
+  if (!audioReady) { await Tone.start(); audioReady = true; }
+}
+
 const BG_BASE = [13, 15, 30]; // #0d0f1e
 function bgForColor(hex, amount = 0.28) {
   const r = parseInt(hex.slice(1,3), 16);
@@ -416,6 +431,9 @@ function activateNote(i, on) {
     lbl.setAttribute('font-weight', 'bold');
     if (sylEl) sylEl.classList.add('current');
     document.body.style.backgroundColor = bgForColor(COLOR[syl]);
+    if (audioReady && NOTE_PITCH[syl]) {
+      synth.triggerAttackRelease(NOTE_PITCH[syl], Math.max(0.1, noteDur() / 1000 * 0.82));
+    }
   } else {
     note.setAttribute('opacity', '0.6');
     note.setAttribute('rx', NOTE_RX);
@@ -474,8 +492,15 @@ function advance() {
 function finish() {
   playing = false;
   document.getElementById('playBtn').textContent = '▶  Play';
-  setTimeout(() => { playhead.setAttribute('opacity', '0'); }, 300);
-  setTimeout(() => { document.body.style.backgroundColor = '#0d0f1e'; }, 600);
+  setTimeout(() => {
+    playhead.setAttribute('opacity', '0');
+    if (cur >= 0)    activateNote(cur,     false);
+    if (curWord >= 0) activateWord(curWord, false);
+  }, noteDur() * 0.9);
+  setTimeout(() => {
+    document.body.style.backgroundColor = '#0d0f1e';
+    cur = -1; curWord = -1;
+  }, noteDur() * 0.9 + 500);
 }
 
 function doReset() {
@@ -502,7 +527,10 @@ function togglePlay() {
   advance();
 }
 
-document.getElementById('playBtn').addEventListener('click',  togglePlay);
+document.getElementById('playBtn').addEventListener('click', async () => {
+  await ensureAudio();
+  togglePlay();
+});
 document.getElementById('resetBtn').addEventListener('click', doReset);
 document.getElementById('tempo').addEventListener('input', function () {
   document.getElementById('bpmVal').textContent = this.value;
