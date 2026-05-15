@@ -792,6 +792,11 @@ document.body.addEventListener('click', ()=>{ if(playing) togglePlay(); });
 // ─────────────────────────────────────────────────────────────────────────────
 // URL CONFIG — push state on play, auto-play when config present in URL
 // ─────────────────────────────────────────────────────────────────────────────
+function dlFilename(ext){
+  const text = document.getElementById('engInput').value.trim();
+  const slug = text.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'translation';
+  return `Solresol-${slug}.${ext}`;
+}
 function buildShareURL(){
   const p = new URLSearchParams();
   p.set('text',       document.getElementById('engInput').value.trim());
@@ -852,7 +857,7 @@ document.getElementById('dlAudioBtn').addEventListener('click', async e=>{
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href     = url;
-      a.download = 'solresol.wav';
+      a.download = dlFilename('wav');
       a.click();
       setTimeout(()=>URL.revokeObjectURL(url), 5000);
     });
@@ -986,7 +991,7 @@ document.getElementById('dlVideoBtn').addEventListener('click', async e=>{
     const blob = new Blob(chunks, {type: mimeType});
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href = url; a.download = 'solresol.webm'; a.click();
+    a.href = url; a.download = dlFilename('webm'); a.click();
     setTimeout(()=>URL.revokeObjectURL(url), 5000);
     Tone.getDestination().disconnect(audioDest);
   } catch(err){
@@ -1077,7 +1082,7 @@ document.getElementById('dlVideoLiveBtn').addEventListener('click', async e=>{
     const blob = new Blob(chunks, {type:mimeType});
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href=url; a.download='solresol-live.webm'; a.click();
+    a.href=url; a.download=dlFilename('webm'); a.click();
     setTimeout(()=>URL.revokeObjectURL(url),5000);
   } catch(err){
     alert('Live video export failed: '+err.message); console.error(err);
