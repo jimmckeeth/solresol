@@ -65,7 +65,7 @@ h1 {
 
 .eng {
   font-size: 1.9rem;
-  color: #444;
+  color: #555;
   transition: color 0.25s, font-size 0.25s;
   line-height: 1.1;
 }
@@ -91,10 +91,12 @@ h1 {
 }
 
 .syl {
-  transition: text-shadow 0.2s;
+  transition: text-shadow 0.2s, opacity 0.2s;
+  opacity: 0.45;
 }
 .word-group.active .syl {
-  text-shadow: 0 0 10px currentColor;
+  opacity: 1;
+  text-shadow: 0 0 14px currentColor, 0 0 30px currentColor;
 }
 .sep { color: #333; }
 
@@ -283,6 +285,15 @@ function mk(tag, attrs) {
 
 // White background rectangle (already handled by CSS on .staff-wrap)
 
+// SVG glow filter for active notes
+const defs = mk('defs', {});
+defs.innerHTML = `
+  <filter id="noteGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>`;
+svg.appendChild(defs);
+
 // Staff lines
 STAFF_LINES.forEach(y => {
   svg.appendChild(mk('line', {
@@ -324,8 +335,9 @@ SEQ.forEach((note, i) => {
 
   // Glow halo (active state)
   svg.appendChild(mk('circle', {
-    cx: x, cy: y, r: NOTE_RX + 8,
+    cx: x, cy: y, r: NOTE_RX + 14,
     fill: color, opacity: '0',
+    filter: 'url(#noteGlow)',
     id: `halo-${i}`,
   }));
 
@@ -339,14 +351,14 @@ SEQ.forEach((note, i) => {
   // Note head
   svg.appendChild(mk('ellipse', {
     cx: x, cy: y, rx: NOTE_RX, ry: NOTE_RY,
-    fill: color, opacity: '0.3', id: `note-${i}`,
+    fill: color, opacity: '0.6', id: `note-${i}`,
   }));
 
   // Syllable label below the staff
   const label = mk('text', {
     x, y: 155, 'text-anchor': 'middle',
     'font-size': '11', 'font-family': 'Georgia, serif', 'font-style': 'italic',
-    fill: color, opacity: '0.4', id: `lbl-${i}`,
+    fill: color, opacity: '0.7', id: `lbl-${i}`,
   });
   label.textContent = syl;
   svg.appendChild(label);
@@ -381,7 +393,7 @@ function activateNote(i, on) {
     note.setAttribute('opacity', '1');
     note.setAttribute('rx', NOTE_RX + 2);
     note.setAttribute('ry', NOTE_RY + 1.5);
-    halo.setAttribute('opacity', '0.18');
+    halo.setAttribute('opacity', '0.55');
     stem.setAttribute('stroke', COLOR[SEQ[i].syl]);
     lbl.setAttribute('opacity', '1');
     lbl.setAttribute('font-size', '13');
@@ -392,7 +404,7 @@ function activateNote(i, on) {
     note.setAttribute('ry', NOTE_RY);
     halo.setAttribute('opacity', '0');
     stem.setAttribute('stroke', '#999');
-    lbl.setAttribute('opacity', '0.4');
+    lbl.setAttribute('opacity', '0.7');
     lbl.setAttribute('font-size', '11');
     lbl.setAttribute('font-weight', 'normal');
   }
@@ -405,9 +417,9 @@ function activateWord(wi, on) {
     g.classList.add('active');
     const firstSyl = PHRASE[wi].solresol[0];
     const c = COLOR[firstSyl] || '#fff';
-    g.style.borderColor     = c + '55';
-    g.style.backgroundColor = c + '11';
-    g.style.boxShadow       = `0 0 24px ${c}33`;
+    g.style.borderColor     = c + 'aa';
+    g.style.backgroundColor = c + '22';
+    g.style.boxShadow       = `0 0 32px ${c}88, 0 0 8px ${c}55`;
   } else {
     g.classList.remove('active');
     g.style.borderColor = g.style.backgroundColor = g.style.boxShadow = '';
