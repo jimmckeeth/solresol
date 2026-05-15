@@ -604,7 +604,12 @@ function togglePlay(){
     document.getElementById('playBtn').textContent='▶  Play';
     return;
   }
-  if(cur>=SEQ.length-1) doReset();
+  // Always restart from note 0 — avoids stale-cursor bugs after text changes
+  cur = -1; curWord = -1;
+  SEQ.forEach((_,i)=>activateNote(i,false));
+  PHRASE.forEach((_,wi)=>activateWord(wi,false));
+  const ph = document.getElementById('playhead');
+  if(ph) ph.setAttribute('opacity','0');
   playing=true;
   document.body.classList.add('playing');
   document.getElementById('playBtn').textContent='⏸  Pause';
@@ -633,11 +638,24 @@ function loadPrefs(){
 // ─────────────────────────────────────────────────────────────────────────────
 let translateTimer=null;
 function runTranslate(){
-  const text=document.getElementById('engInput').value.trim();
-  doReset();
+  const text = document.getElementById('engInput').value.trim();
+  // Stop playback; buildPhrase/buildStaff do a full innerHTML rebuild so
+  // there's no need to deactivate individual old DOM nodes first.
+  clearTimeout(timer);
+  playing  = false;
+  document.body.classList.remove('playing');
+  document.getElementById('playBtn').textContent = '▶  Play';
+  document.body.style.backgroundColor = '#0d0f1e';
+
   PHRASE = text ? translate(text) : [];
   buildPhrase();
-  buildStaff();
+  buildStaff();  // rebuilds SEQ
+
+  // Reset position AFTER SEQ is rebuilt
+  cur = -1;  curWord = -1;
+  const ph = document.getElementById('playhead');
+  if (ph) ph.setAttribute('opacity', '0');
+
   savePrefs();
 }
 function scheduleTranslate(){
