@@ -144,6 +144,12 @@ h1 {
 .btn.play  { border-color: #2288FF; color: #2288FF; }
 .btn.play:hover { background: #2288FF; color: #fff; }
 
+select.btn {
+  background: #0d0f1e;
+  cursor: pointer;
+  padding-right: 0.8rem;
+}
+
 .tempo-row {
   display: flex;
   align-items: center;
@@ -180,6 +186,13 @@ input[type=range] {
 <div class="controls">
   <button class="btn play" id="playBtn">▶  Play</button>
   <button class="btn"      id="resetBtn">↺  Reset</button>
+  <select class="btn" id="instrument">
+    <option value="marimba">Marimba</option>
+    <option value="flute">Flute</option>
+    <option value="organ">Organ</option>
+    <option value="bell">Bell</option>
+    <option value="strings">Strings</option>
+  </select>
   <div class="tempo-row">
     <span>♩ =</span>
     <input type="range" id="tempo" min="40" max="160" value="72">
@@ -393,11 +406,22 @@ function noteDur()  { return 60000 / bpm(); }
 // ── Audio ──────────────────────────────────────────────────────────────────
 const NOTE_PITCH = { Do:'C4', Re:'D4', Mi:'E4', Fa:'F4', Sol:'G4', La:'A4', Si:'B4' };
 
+const INSTRUMENTS = {
+  marimba: { oscillator:{ type:'triangle8' }, envelope:{ attack:0.01, decay:0.4,  sustain:0.15, release:1.4 } },
+  flute:   { oscillator:{ type:'sine'      }, envelope:{ attack:0.12, decay:0.1,  sustain:0.75, release:0.9 } },
+  organ:   { oscillator:{ type:'square8'   }, envelope:{ attack:0.01, decay:0.01, sustain:0.9,  release:0.1 } },
+  bell:    { oscillator:{ type:'sine'      }, envelope:{ attack:0.001,decay:0.6,  sustain:0.0,  release:2.0 } },
+  strings: { oscillator:{ type:'sawtooth8' }, envelope:{ attack:0.35, decay:0.1,  sustain:0.8,  release:1.2 } },
+};
+
 const reverb = new Tone.Reverb({ decay: 2, wet: 0.25 }).toDestination();
-const synth  = new Tone.Synth({
-  oscillator: { type: 'triangle8' },
-  envelope:   { attack: 0.01, decay: 0.4, sustain: 0.15, release: 1.4 },
-}).connect(reverb);
+let synth = new Tone.Synth(INSTRUMENTS.marimba).connect(reverb);
+
+function setInstrument(name) {
+  const old = synth;
+  synth = new Tone.Synth(INSTRUMENTS[name]).connect(reverb);
+  old.dispose();
+}
 
 let audioReady = false;
 async function ensureAudio() {
@@ -422,10 +446,11 @@ function activateNote(i, on) {
   if (!note) return;
   if (on) {
     note.setAttribute('opacity', '1');
-    note.setAttribute('rx', NOTE_RX + 2);
-    note.setAttribute('ry', NOTE_RY + 1.5);
+    note.setAttribute('rx', NOTE_RX + 6);
+    note.setAttribute('ry', NOTE_RY + 4);
     halo.setAttribute('opacity', '0.55');
     stem.setAttribute('stroke', COLOR[syl]);
+    stem.setAttribute('stroke-width', '3.5');
     lbl.setAttribute('opacity', '1');
     lbl.setAttribute('font-size', '13');
     lbl.setAttribute('font-weight', 'bold');
@@ -440,6 +465,7 @@ function activateNote(i, on) {
     note.setAttribute('ry', NOTE_RY);
     halo.setAttribute('opacity', '0');
     stem.setAttribute('stroke', '#999');
+    stem.setAttribute('stroke-width', '1.8');
     lbl.setAttribute('opacity', '0.7');
     lbl.setAttribute('font-size', '11');
     lbl.setAttribute('font-weight', 'normal');
@@ -492,15 +518,12 @@ function advance() {
 function finish() {
   playing = false;
   document.getElementById('playBtn').textContent = '▶  Play';
-  setTimeout(() => {
-    playhead.setAttribute('opacity', '0');
-    if (cur >= 0)    activateNote(cur,     false);
-    if (curWord >= 0) activateWord(curWord, false);
-  }, noteDur() * 0.9);
+  playhead.setAttribute('opacity', '0');
+  if (curWord >= 0) activateWord(curWord, false);
   setTimeout(() => {
     document.body.style.backgroundColor = '#0d0f1e';
     cur = -1; curWord = -1;
-  }, noteDur() * 0.9 + 500);
+  }, 800);
 }
 
 function doReset() {
@@ -534,6 +557,9 @@ document.getElementById('playBtn').addEventListener('click', async () => {
 document.getElementById('resetBtn').addEventListener('click', doReset);
 document.getElementById('tempo').addEventListener('input', function () {
   document.getElementById('bpmVal').textContent = this.value;
+});
+document.getElementById('instrument').addEventListener('change', function () {
+  setInstrument(this.value);
 });
 </script>
 </body>
