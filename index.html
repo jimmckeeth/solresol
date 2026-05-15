@@ -201,6 +201,16 @@ input[type=range] { width: 90px; accent-color: #2288FF; cursor: pointer; }
 body.playing .pause-hint { opacity: 1; }
 
 .note-label { font-size: 0.72rem; color: #333; letter-spacing: 0.03em; }
+
+/* ── Download / share row ── */
+.dl-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+.btn.dl { font-size: 0.8rem; padding: 0.35rem 0.8rem; color: #666; border-color: #333; }
+.btn.dl:hover { color: #ccc; border-color: #666; }
+.btn.dl.working { opacity: 0.5; cursor: wait; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -233,6 +243,11 @@ body.playing .pause-hint { opacity: 1; }
     <span>♩ =</span>
     <input type="range" id="tempo" min="40" max="160" value="72">
     <span id="bpmVal">72</span>
+  </div>
+  <div class="dl-row">
+    <button class="btn dl" id="dlAudioBtn">⬇ Audio</button>
+    <button class="btn dl" id="dlVideoBtn">⬇ Video</button>
+    <button class="btn dl" id="copyUrlBtn">🔗 Copy URL</button>
   </div>
 </div>
 
@@ -613,6 +628,7 @@ function togglePlay(){
   playing=true;
   document.body.classList.add('playing');
   document.getElementById('playBtn').textContent='⏸  Pause';
+  pushStateToURL();
   advance();
 }
 
@@ -689,19 +705,232 @@ document.getElementById('tempo').addEventListener('input', function(){
 document.body.addEventListener('click', ()=>{ if(playing) togglePlay(); });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// URL CONFIG — push state on play, auto-play when config present in URL
+// ─────────────────────────────────────────────────────────────────────────────
+function buildShareURL(){
+  const p = new URLSearchParams();
+  p.set('text',       document.getElementById('engInput').value.trim());
+  p.set('instrument', document.getElementById('instrument').value);
+  p.set('tempo',      document.getElementById('tempo').value);
+  return location.origin + location.pathname + '?' + p.toString();
+}
+function pushStateToURL(){
+  history.replaceState(null,'', buildShareURL());
+}
+document.getElementById('copyUrlBtn').addEventListener('click', e=>{
+  e.stopPropagation();
+  navigator.clipboard.writeText(buildShareURL()).then(()=>{
+    const b = document.getElementById('copyUrlBtn');
+    const old = b.textContent; b.textContent = '✓ Copied!';
+    setTimeout(()=>{ b.textContent = old; }, 1800);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUDIO DOWNLOAD — render offline via OfflineAudioContext
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById('dlAudioBtn').addEventListener('click', async e=>{
+  e.stopPropagation();
+  const btn = document.getElementById('dlAudioBtn');
+  if(btn.classList.contains('working')) return;
+  btn.classList.add('working'); btn.textContent = '⏳ Rendering…';
+  try {
+    // Calculate total duration
+    const bpm   = parseInt(document.getElementById('tempo').value,10);
+    const beat  = 60/bpm;
+    const total = SEQ.length * beat + beat; // pad 1 beat at end
+    const sr    = 44100;
+    const offCtx = new OfflineAudioContext(2, Math.ceil(total*sr), sr);
+    const offReverb = new Tone.Reverb({ decay:2.5, wet:0.22 });
+    // Re-create a PolySynth in offline context — Tone.js offline rendering
+    await Tone.Offline(async ()=>{
+      const instName = document.getElementById('instrument').value;
+      let offInst;
+      if(SYNTH_CONFIGS[instName]){
+        offInst = new Tone.PolySynth(Tone.Synth, SYNTH_CONFIGS[instName]);
+      } else {
+        offInst = new Tone.PolySynth(Tone.Synth, SYNTH_CONFIGS.marimba);
+      }
+      const offRev = new Tone.Reverb({ decay:2.5, wet:0.22 });
+      await offRev.ready;
+      offInst.connect(offRev);
+      offRev.toDestination();
+      const noteDur = beat * 0.85;
+      SEQ.forEach((item, idx)=>{
+        const t = idx * beat;
+        offInst.triggerAttackRelease(NOTE_PITCH[item.syl], noteDur, t);
+      });
+    }, total).then(buf=>{
+      // Encode to WAV
+      const wav = audioBufferToWav(buf);
+      const blob = new Blob([wav], { type:'audio/wav' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = 'solresol.wav';
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(url), 5000);
+    });
+  } catch(err){
+    alert('Audio export failed: '+err.message);
+    console.error(err);
+  } finally {
+    btn.classList.remove('working'); btn.textContent = '⬇ Audio';
+  }
+});
+
+// Minimal PCM WAV encoder
+function audioBufferToWav(buffer){
+  const numCh = buffer.numberOfChannels;
+  const sr    = buffer.sampleRate;
+  const len   = buffer.length;
+  const ab    = new ArrayBuffer(44 + len * numCh * 2);
+  const view  = new DataView(ab);
+  function str(o,s){ for(let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); }
+  function u32(o,v){ view.setUint32(o,v,true); }
+  function u16(o,v){ view.setUint16(o,v,true); }
+  str(0,'RIFF'); u32(4,36+len*numCh*2); str(8,'WAVE');
+  str(12,'fmt '); u32(16,16); u16(20,1); u16(22,numCh);
+  u32(24,sr); u32(28,sr*numCh*2); u16(32,numCh*2); u16(34,16);
+  str(36,'data'); u32(40,len*numCh*2);
+  const ch = [];
+  for(let c=0;c<numCh;c++) ch.push(buffer.getChannelData(c));
+  let off=44;
+  for(let i=0;i<len;i++){
+    for(let c=0;c<numCh;c++){
+      const s = Math.max(-1,Math.min(1,ch[c][i]));
+      view.setInt16(off, s<0 ? s*0x8000 : s*0x7FFF, true);
+      off+=2;
+    }
+  }
+  return ab;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIDEO DOWNLOAD — canvas-capture MediaRecorder
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById('dlVideoBtn').addEventListener('click', async e=>{
+  e.stopPropagation();
+  const btn = document.getElementById('dlVideoBtn');
+  if(btn.classList.contains('working')) return;
+  if(!('MediaRecorder' in window)){
+    alert('MediaRecorder not supported in this browser. Try Chrome.');
+    return;
+  }
+  btn.classList.add('working'); btn.textContent = '⏳ Recording…';
+  try {
+    const bpm      = parseInt(document.getElementById('tempo').value,10);
+    const beat     = 60/bpm;
+    const noteDurMs = beat * 1000;
+    // Snapshot the staff SVG into an offscreen canvas for each note frame
+    const staffEl  = document.getElementById('staff');
+    const phraseEl = document.getElementById('phrase');
+    const W = 900, H = 540;
+    const canvas   = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx2d    = canvas.getContext('2d');
+    // Set up MediaRecorder
+    const stream  = canvas.captureStream(30);
+    // Try to get system audio — not possible in browser; mix in silence
+    const audioCtx = new AudioContext();
+    const dest     = audioCtx.createMediaStreamDestination();
+    const silence  = audioCtx.createGain(); silence.gain.value=0;
+    silence.connect(dest);
+    stream.addTrack(dest.stream.getTracks()[0]);
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+      ? 'video/webm;codecs=vp9,opus' : 'video/webm';
+    const rec = new MediaRecorder(stream, { mimeType });
+    const chunks = [];
+    rec.ondataavailable = ev => { if(ev.data.size) chunks.push(ev.data); };
+    // Helper: draw a single frame
+    async function drawFrame(noteIdx){
+      return new Promise(res=>{
+        // Background color
+        const col = noteIdx >= 0 ? COLOR[SEQ[noteIdx].syl] : '#0d0f1e';
+        const bg  = noteIdx >= 0 ? bgFor(col) : '#0d0f1e';
+        ctx2d.fillStyle = bg;
+        ctx2d.fillRect(0,0,W,H);
+        // Use foreignObject trick: draw phrase + staff via SVG data URL
+        const svgStr = `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H}'>
+          <foreignObject width='${W}' height='${H}'>
+            <div xmlns='http://www.w3.org/1999/xhtml' style='width:${W}px;height:${H}px;background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;font-family:Georgia,serif;'>
+            </div>
+          </foreignObject>
+        </svg>`;
+        const img = new Image();
+        img.onload = ()=>{ ctx2d.drawImage(img,0,0); res(); };
+        img.onerror = ()=>res();
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
+      });
+    }
+    // Simple approach: paint frames per note using requestAnimationFrame timing
+    rec.start(100);
+    await ensureAudio();
+    // Activate each note visually and play audio in sync
+    for(let i=0; i<SEQ.length; i++){
+      const item = SEQ[i];
+      const col  = COLOR[item.syl];
+      const bg   = bgFor(col);
+      ctx2d.fillStyle = bg;
+      ctx2d.fillRect(0,0,W,H);
+      // Title
+      ctx2d.fillStyle = '#55555588';
+      ctx2d.font = '18px Georgia';
+      ctx2d.textAlign = 'center';
+      ctx2d.fillText('SOLRESOL', W/2, 50);
+      // Syl pill
+      ctx2d.font = 'bold 72px Georgia';
+      ctx2d.fillStyle = col;
+      ctx2d.textAlign = 'center';
+      ctx2d.fillText(item.syl, W/2, H/2 - 20);
+      // English word
+      const word = PHRASE[item.wi] ? PHRASE[item.wi].english : '';
+      ctx2d.font = '36px Georgia';
+      ctx2d.fillStyle = '#ffffff';
+      ctx2d.fillText(word, W/2, H/2 + 48);
+      // Pitch
+      ctx2d.font = '20px Georgia';
+      ctx2d.fillStyle = col+'99';
+      ctx2d.fillText(NOTE_PITCH[item.syl], W/2, H/2 + 90);
+      instrument.triggerAttackRelease(NOTE_PITCH[item.syl], beat*0.85);
+      await new Promise(r=>setTimeout(r, noteDurMs));
+    }
+    // Pause a beat then stop
+    await new Promise(r=>setTimeout(r, noteDurMs));
+    rec.stop();
+    await new Promise(r=>{ rec.onstop = r; });
+    const blob = new Blob(chunks, {type: mimeType});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'solresol.webm'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+    audioCtx.close();
+  } catch(err){
+    alert('Video export failed: '+err.message);
+    console.error(err);
+  } finally {
+    btn.classList.remove('working'); btn.textContent = '⬇ Video';
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // INIT — URL param > localStorage > default
 // ─────────────────────────────────────────────────────────────────────────────
 (async()=>{
-  const prefs = loadPrefs();
-  const urlText = new URLSearchParams(window.location.search).get('text');
+  const prefs  = loadPrefs();
+  const params = new URLSearchParams(window.location.search);
+  const urlText = params.get('text');
+  const urlInst = params.get('instrument');
+  const urlTempo= params.get('tempo');
+  const hasURLConfig = urlText || urlInst || urlTempo;
 
-  // Restore tempo
-  const tempo = prefs.tempo || '72';
+  // Restore tempo — URL wins
+  const tempo = urlTempo || prefs.tempo || '72';
   document.getElementById('tempo').value = tempo;
   document.getElementById('bpmVal').textContent = tempo;
 
   // Restore instrument UI (audio not started yet, just set select value)
-  const instName = prefs.instrument || 'piano';
+  const instName = urlInst || prefs.instrument || 'piano';
   document.getElementById('instrument').value = instName;
   // Kick off sampler load immediately so it's ready when user hits play
   await setInstrument(instName, true);
@@ -709,10 +938,17 @@ document.body.addEventListener('click', ()=>{ if(playing) togglePlay(); });
   // Restore / set text — URL param wins
   const text = urlText ?? prefs.text ?? 'What is your name';
   document.getElementById('engInput').value = text;
+  lastTranslatedText = text.trim();
 
   PHRASE = translate(text);
   buildPhrase();
   buildStaff();
+
+  // Auto-play if URL had config params (shareable link)
+  if(hasURLConfig){
+    await ensureAudio();
+    togglePlay();
+  }
 })();
 </script>
 </body>
