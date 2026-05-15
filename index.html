@@ -92,12 +92,16 @@ h1 {
 }
 
 .syl {
-  transition: text-shadow 0.2s, opacity 0.2s;
+  transition: text-shadow 0.2s, opacity 0.2s, font-size 0.15s;
   opacity: 0.45;
 }
 .word-group.active .syl {
   opacity: 1;
   text-shadow: 0 0 14px currentColor, 0 0 30px currentColor;
+}
+.syl.current {
+  font-size: 1.55em;
+  text-shadow: 0 0 14px currentColor, 0 0 30px currentColor, 0 0 55px currentColor;
 }
 .sep { color: #333; }
 
@@ -256,6 +260,7 @@ PHRASE.forEach((word, wi) => {
     }
     const span = document.createElement('span');
     span.className = 'syl';
+    span.id = `syl-${wi}-${si}`;
     span.textContent = syl;
     span.style.color = COLOR[syl] || '#888';
     sylsEl.appendChild(span);
@@ -397,18 +402,22 @@ function activateNote(i, on) {
   const halo  = document.getElementById(`halo-${i}`);
   const stem  = document.getElementById(`stem-${i}`);
   const lbl   = document.getElementById(`lbl-${i}`);
+  const { syl, wi, si } = SEQ[i];
+  const sylEl = document.getElementById(`syl-${wi}-${si}`);
   if (!note) return;
   if (on) {
     note.setAttribute('opacity', '1');
     note.setAttribute('rx', NOTE_RX + 2);
     note.setAttribute('ry', NOTE_RY + 1.5);
     halo.setAttribute('opacity', '0.55');
-    stem.setAttribute('stroke', COLOR[SEQ[i].syl]);
+    stem.setAttribute('stroke', COLOR[syl]);
     lbl.setAttribute('opacity', '1');
     lbl.setAttribute('font-size', '13');
     lbl.setAttribute('font-weight', 'bold');
+    if (sylEl) sylEl.classList.add('current');
+    document.body.style.backgroundColor = bgForColor(COLOR[syl]);
   } else {
-    note.setAttribute('opacity', '0.3');
+    note.setAttribute('opacity', '0.6');
     note.setAttribute('rx', NOTE_RX);
     note.setAttribute('ry', NOTE_RY);
     halo.setAttribute('opacity', '0');
@@ -416,6 +425,7 @@ function activateNote(i, on) {
     lbl.setAttribute('opacity', '0.7');
     lbl.setAttribute('font-size', '11');
     lbl.setAttribute('font-weight', 'normal');
+    if (sylEl) sylEl.classList.remove('current');
   }
 }
 
@@ -429,7 +439,6 @@ function activateWord(wi, on) {
     g.style.borderColor     = c + 'aa';
     g.style.backgroundColor = c + '22';
     g.style.boxShadow       = `0 0 32px ${c}88, 0 0 8px ${c}55`;
-    document.body.style.backgroundColor = bgForColor(c);
   } else {
     g.classList.remove('active');
     g.style.borderColor = g.style.backgroundColor = g.style.boxShadow = '';
