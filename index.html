@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solresol Visualizer</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --do:  #FF3B3B;
+  --re:  #FF8C00;
+  --mi:  #FFD700;
+  --fa:  #22BB55;
+  --sol: #2288FF;
+  --la:  #8833CC;
+  --si:  #CC44FF;
+}
+
+body {
+  background: #0d0f1e;
+  color: #ccc;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2rem 1rem;
+}
+
+/* ── Title ── */
+h1 {
+  font-size: 1.4rem;
+  font-weight: normal;
+  letter-spacing: 0.6em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+/* ── Phrase display ── */
+.phrase {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.word-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s;
+}
+
+.word-group.active {
+  transform: translateY(-4px);
+}
+
+.eng {
+  font-size: 1.9rem;
+  color: #444;
+  transition: color 0.25s, font-size 0.25s;
+  line-height: 1.1;
+}
+
+.word-group.active .eng {
+  color: #fff;
+  font-size: 2.4rem;
+}
+
+.syls {
+  display: flex;
+  gap: 3px;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #333;
+  transition: font-size 0.25s;
+  align-items: center;
+  min-height: 1.4em;
+}
+
+.word-group.active .syls {
+  font-size: 1.05rem;
+}
+
+.syl {
+  transition: text-shadow 0.2s;
+}
+.word-group.active .syl {
+  text-shadow: 0 0 10px currentColor;
+}
+.sep { color: #333; }
+
+/* ── Staff container ── */
+.staff-wrap {
+  width: 100%;
+  max-width: 860px;
+  background: #f7f5ee;
+  border-radius: 14px;
+  padding: 1.2rem 1.8rem;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+
+#staff { display: block; width: 100%; height: auto; }
+
+/* ── Controls ── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  padding: 0.55rem 1.4rem;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  min-width: 7rem;
+}
+.btn:hover { border-color: #777; color: #ddd; }
+.btn.play  { border-color: #2288FF; color: #2288FF; }
+.btn.play:hover { background: #2288FF; color: #fff; }
+
+.tempo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #555;
+  font-size: 0.9rem;
+}
+input[type=range] {
+  width: 90px;
+  accent-color: #2288FF;
+  cursor: pointer;
+}
+#bpmVal { color: #777; min-width: 2.5em; }
+
+/* ── Subtitle note ── */
+.note-label {
+  font-size: 0.72rem;
+  color: #333;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<h1>Solresol</h1>
+
+<div id="phrase" class="phrase"></div>
+
+<div class="staff-wrap">
+  <svg id="staff" viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<div class="controls">
+  <button class="btn play" id="playBtn">▶  Play</button>
+  <button class="btn"      id="resetBtn">↺  Reset</button>
+  <div class="tempo-row">
+    <span>♩ =</span>
+    <input type="range" id="tempo" min="40" max="160" value="72">
+    <span id="bpmVal">72</span>
+  </div>
+</div>
+
+<p class="note-label">Prototype — translations are illustrative placeholders</p>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// Solresol solfège color system (rainbow: Do=red … Si=violet)
+// ─────────────────────────────────────────────────────────────────────────────
+const COLOR = {
+  Do:  '#FF3B3B',
+  Re:  '#FF8C00',
+  Mi:  '#FFD700',
+  Fa:  '#22BB55',
+  Sol: '#2288FF',
+  La:  '#8833CC',
+  Si:  '#CC44FF',
+};
+
+// Y position of each note on the staff.
+// Staff lines (treble clef) at y = 55, 70, 85, 100, 115
+//   Line 1 (bottom) = E4 → y=115
+//   Line 2 = G4 → y=100
+//   Line 3 (mid)  = B4 → y=85
+//   Line 4 = D5 → y=70
+//   Line 5 (top)  = F5 → y=55
+// Each diatonic step = 7.5px upward (−y)
+//   C4 (Do) = ledger line below:  y = 115 + 15 = 130
+//   D4 (Re) = below staff:        y = 115 + 7.5 ≈ 123
+//   E4 (Mi) = line 1:             y = 115
+//   F4 (Fa) = first space:        y = 107.5 ≈ 108
+//   G4 (Sol)= line 2:             y = 100
+//   A4 (La) = second space:       y = 92.5 ≈ 93
+//   B4 (Si) = line 3:             y = 85
+const NOTE_Y = { Do:130, Re:123, Mi:115, Fa:108, Sol:100, La:93, Si:85 };
+
+// Example phrase (placeholder translations)
+const PHRASE = [
+  { english: 'What',   solresol: ['Sol', 'La']       },
+  { english: 'is',     solresol: ['Do']              },
+  { english: 'your',   solresol: ['Re', 'Mi']        },
+  { english: 'name?',  solresol: ['Fa', 'Sol', 'La'] },
+];
+
+// Flatten notes with back-reference to word index
+const SEQ = [];
+PHRASE.forEach((word, wi) => {
+  word.solresol.forEach((syl, si) => {
+    SEQ.push({ syl, wi, si, x: 0 }); // x filled during SVG build
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD PHRASE DOM
+// ─────────────────────────────────────────────────────────────────────────────
+const phraseEl = document.getElementById('phrase');
+PHRASE.forEach((word, wi) => {
+  const group = document.createElement('div');
+  group.className = 'word-group';
+  group.id = `wg-${wi}`;
+
+  const eng = document.createElement('div');
+  eng.className = 'eng';
+  eng.textContent = word.english;
+
+  const sylsEl = document.createElement('div');
+  sylsEl.className = 'syls';
+  word.solresol.forEach((syl, si) => {
+    if (si > 0) {
+      const sep = document.createElement('span');
+      sep.className = 'sep';
+      sep.textContent = '·';
+      sylsEl.appendChild(sep);
+    }
+    const span = document.createElement('span');
+    span.className = 'syl';
+    span.textContent = syl;
+    span.style.color = COLOR[syl] || '#888';
+    sylsEl.appendChild(span);
+  });
+
+  group.appendChild(eng);
+  group.appendChild(sylsEl);
+  phraseEl.appendChild(group);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD STAFF SVG
+// ─────────────────────────────────────────────────────────────────────────────
+const svg = document.getElementById('staff');
+const NS  = 'http://www.w3.org/2000/svg';
+const STAFF_LINES = [55, 70, 85, 100, 115]; // F5 D5 B4 G4 E4
+const CLEF_W  = 72;   // width reserved for clef
+const PAD_R   = 30;
+const SVG_W   = 820;
+const NOTE_RX = 8;    // note head x-radius
+const NOTE_RY = 6;    // note head y-radius (slightly squashed)
+
+function mk(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// White background rectangle (already handled by CSS on .staff-wrap)
+
+// Staff lines
+STAFF_LINES.forEach(y => {
+  svg.appendChild(mk('line', {
+    x1: CLEF_W - 8, y1: y, x2: SVG_W - PAD_R, y2: y,
+    stroke: '#888', 'stroke-width': '1.5',
+  }));
+});
+
+// Treble clef glyph
+const clefText = mk('text', {
+  x: 4, y: 125,
+  'font-size': '90',
+  'font-family': 'serif',
+  fill: '#aaa',
+});
+clefText.textContent = '\u{1D11E}'; // 𝄞
+svg.appendChild(clefText);
+
+// Compute evenly-spaced note X positions
+const usableW = SVG_W - PAD_R - CLEF_W - 20;
+const step    = usableW / (SEQ.length + 1);
+SEQ.forEach((note, i) => {
+  note.x = CLEF_W + 10 + step * (i + 1);
+});
+
+// Draw notes
+SEQ.forEach((note, i) => {
+  const { syl, x } = note;
+  const y     = NOTE_Y[syl];
+  const color = COLOR[syl];
+
+  // Ledger line for Do (C4, below staff)
+  if (syl === 'Do') {
+    svg.appendChild(mk('line', {
+      x1: x - NOTE_RX - 4, y1: y, x2: x + NOTE_RX + 4, y2: y,
+      stroke: '#888', 'stroke-width': '1.5', id: `ledger-${i}`,
+    }));
+  }
+
+  // Glow halo (active state)
+  svg.appendChild(mk('circle', {
+    cx: x, cy: y, r: NOTE_RX + 8,
+    fill: color, opacity: '0',
+    id: `halo-${i}`,
+  }));
+
+  // Note stem (all our notes are below middle B4, so stem goes up from right)
+  const stemX = x + NOTE_RX - 1;
+  svg.appendChild(mk('line', {
+    x1: stemX, y1: y, x2: stemX, y2: y - 32,
+    stroke: '#999', 'stroke-width': '1.8', id: `stem-${i}`,
+  }));
+
+  // Note head
+  svg.appendChild(mk('ellipse', {
+    cx: x, cy: y, rx: NOTE_RX, ry: NOTE_RY,
+    fill: color, opacity: '0.3', id: `note-${i}`,
+  }));
+
+  // Syllable label below the staff
+  const label = mk('text', {
+    x, y: 155, 'text-anchor': 'middle',
+    'font-size': '11', 'font-family': 'Georgia, serif', 'font-style': 'italic',
+    fill: color, opacity: '0.4', id: `lbl-${i}`,
+  });
+  label.textContent = syl;
+  svg.appendChild(label);
+});
+
+// Playhead (vertical cursor)
+const playhead = mk('rect', {
+  x: -2, y: 48, width: 2, height: 110,
+  fill: '#2288FF', opacity: '0', id: 'playhead',
+});
+playhead.style.transition = 'transform 0.12s ease, opacity 0.2s';
+svg.appendChild(playhead);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ANIMATION STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let cur      = -1;   // current note index in SEQ
+let curWord  = -1;   // current word index
+let playing  = false;
+let timer    = null;
+
+function bpm()      { return parseInt(document.getElementById('tempo').value); }
+function noteDur()  { return 60000 / bpm(); }
+
+function activateNote(i, on) {
+  const note  = document.getElementById(`note-${i}`);
+  const halo  = document.getElementById(`halo-${i}`);
+  const stem  = document.getElementById(`stem-${i}`);
+  const lbl   = document.getElementById(`lbl-${i}`);
+  if (!note) return;
+  if (on) {
+    note.setAttribute('opacity', '1');
+    note.setAttribute('rx', NOTE_RX + 2);
+    note.setAttribute('ry', NOTE_RY + 1.5);
+    halo.setAttribute('opacity', '0.18');
+    stem.setAttribute('stroke', COLOR[SEQ[i].syl]);
+    lbl.setAttribute('opacity', '1');
+    lbl.setAttribute('font-size', '13');
+    lbl.setAttribute('font-weight', 'bold');
+  } else {
+    note.setAttribute('opacity', '0.3');
+    note.setAttribute('rx', NOTE_RX);
+    note.setAttribute('ry', NOTE_RY);
+    halo.setAttribute('opacity', '0');
+    stem.setAttribute('stroke', '#999');
+    lbl.setAttribute('opacity', '0.4');
+    lbl.setAttribute('font-size', '11');
+    lbl.setAttribute('font-weight', 'normal');
+  }
+}
+
+function activateWord(wi, on) {
+  const g = document.getElementById(`wg-${wi}`);
+  if (!g) return;
+  if (on) {
+    g.classList.add('active');
+    const firstSyl = PHRASE[wi].solresol[0];
+    const c = COLOR[firstSyl] || '#fff';
+    g.style.borderColor     = c + '55';
+    g.style.backgroundColor = c + '11';
+    g.style.boxShadow       = `0 0 24px ${c}33`;
+  } else {
+    g.classList.remove('active');
+    g.style.borderColor = g.style.backgroundColor = g.style.boxShadow = '';
+  }
+}
+
+function advance() {
+  if (cur >= 0) activateNote(cur, false);
+  cur++;
+
+  if (cur >= SEQ.length) {
+    finish(); return;
+  }
+
+  const entry = SEQ[cur];
+
+  // Word transition
+  if (entry.wi !== curWord) {
+    if (curWord >= 0) activateWord(curWord, false);
+    curWord = entry.wi;
+    activateWord(curWord, true);
+  }
+
+  // Move playhead
+  playhead.style.transform = `translateX(${entry.x}px)`;
+  playhead.setAttribute('opacity', '0.55');
+
+  activateNote(cur, true);
+
+  if (playing) timer = setTimeout(advance, noteDur());
+}
+
+function finish() {
+  playing = false;
+  document.getElementById('playBtn').textContent = '▶  Play';
+  setTimeout(() => { playhead.setAttribute('opacity', '0'); }, 300);
+}
+
+function doReset() {
+  clearTimeout(timer);
+  playing = false;
+  cur = -1; curWord = -1;
+  document.getElementById('playBtn').textContent = '▶  Play';
+  SEQ.forEach((_, i)  => activateNote(i,  false));
+  PHRASE.forEach((_, wi) => activateWord(wi, false));
+  playhead.setAttribute('opacity', '0');
+}
+
+function togglePlay() {
+  if (playing) {
+    clearTimeout(timer);
+    playing = false;
+    document.getElementById('playBtn').textContent = '▶  Play';
+    return;
+  }
+  if (cur >= SEQ.length - 1) doReset();
+  playing = true;
+  document.getElementById('playBtn').textContent = '⏸  Pause';
+  advance();
+}
+
+document.getElementById('playBtn').addEventListener('click',  togglePlay);
+document.getElementById('resetBtn').addEventListener('click', doReset);
+document.getElementById('tempo').addEventListener('input', function () {
+  document.getElementById('bpmVal').textContent = this.value;
+});
+</script>
+</body>
+</html>
