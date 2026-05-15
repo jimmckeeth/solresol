@@ -213,18 +213,25 @@ body.playing .pause-hint { opacity: 1; }
 .btn.dl.working { opacity: 0.5; cursor: wait; pointer-events: none; }
 .sauso-bg {
   position: fixed;
-  left: 2vw;
+  left: 1.5vw;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 9rem;
-  color: #888;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s, color 0.3s;
-  letter-spacing: -0.05em;
-  line-height: 1;
+  transition: opacity 0.35s;
   z-index: 0;
   user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+.script-syl {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 4.5rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
 }
 .encoding-col {
   position: fixed;
@@ -305,7 +312,6 @@ const COLOR = {
 };
 const NOTE_Y  = { Do:130, Re:123, Mi:115, Fa:108, Sol:100, La:93, Si:85 };
 const NOTE_PITCH = { Do:'C4', Re:'D4', Mi:'E4', Fa:'F4', Sol:'G4', La:'A4', Si:'B4' };
-const SAUSO    = { Do:'\u{10474}', Re:'\u{10466}', Mi:'\u{10475}', Fa:'\u{10473}', Sol:'\u{1046F}', La:'\u{10464}', Si:'\u{10468}' };
 const NUM      = { Do:1, Re:2, Mi:3, Fa:4, Sol:5, La:6, Si:7 };
 const BINARY   = { Do:'001', Re:'010', Mi:'011', Fa:'100', Sol:'101', La:'110', Si:'111' };
 const BRAILLE  = { Do:'⠁', Re:'⠂', Mi:'⠃', Fa:'⠄', Sol:'⠅', La:'⠆', Si:'⠇' };
@@ -584,13 +590,14 @@ function activateNote(i,on){
     if(sylEl) sylEl.classList.add('current');
     document.body.style.backgroundColor=bgFor(COLOR[syl]);
     triggerNote(syl);
-    // Update sauso display (whole word's syllables)
-    const wordSyls = SEQ.filter(s => s.wi === wi).map(s => SAUSO[s.syl]).join('');
+    // Update script display: current word's syllables in their rainbow colors
+    const wordSylItems = SEQ.filter(s => s.wi === wi);
     const sausoEl = document.getElementById('sausoDisplay');
     if (sausoEl) {
-      sausoEl.textContent = wordSyls;
-      sausoEl.style.color = COLOR[syl] + '60';  // color at 38% alpha via hex
-      sausoEl.style.opacity = '0.35';
+      sausoEl.innerHTML = wordSylItems.map(s =>
+        `<div class="script-syl" style="color:${COLOR[s.syl]}55">${s.syl}</div>`
+      ).join('');
+      sausoEl.style.opacity = '1';
     }
     // Update encoding display (current syllable)
     const encEl = document.getElementById('encodingDisplay');
@@ -787,7 +794,7 @@ document.getElementById('instrument').addEventListener('change', function(e){
 document.getElementById('tempo').addEventListener('input', function(){
   document.getElementById('bpmVal').textContent=this.value; savePrefs();
 });
-document.body.addEventListener('click', ()=>{ if(playing) togglePlay(); });
+document.body.addEventListener('click', e=>{ if(playing && !e.target.closest('.controls, .input-area')) togglePlay(); });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // URL CONFIG — push state on play, auto-play when config present in URL
