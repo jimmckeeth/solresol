@@ -285,6 +285,7 @@ body.playing .pause-hint { opacity: 1; }
   <div class="dl-row">
     <button class="btn dl" id="dlAudioBtn">⬇ Audio</button>
     <button class="btn dl" id="dlVideoBtn">⬇ Video</button>
+    <button class="btn dl" id="dlVideoLiveBtn">⬇ Video (Live)</button>
     <button class="btn dl" id="copyUrlBtn">🔗 Copy URL</button>
   </div>
 </div>
@@ -915,12 +916,11 @@ document.getElementById('dlVideoBtn').addEventListener('click', async e=>{
     const ctx2d    = canvas.getContext('2d');
     // Set up MediaRecorder
     const stream  = canvas.captureStream(30);
-    // Try to get system audio — not possible in browser; mix in silence
-    const audioCtx = new AudioContext();
-    const dest     = audioCtx.createMediaStreamDestination();
-    const silence  = audioCtx.createGain(); silence.gain.value=0;
-    silence.connect(dest);
-    stream.addTrack(dest.stream.getTracks()[0]);
+    // Route Tone.js master output into the capture stream
+    const captureCtx = Tone.getContext().rawContext;
+    const audioDest  = captureCtx.createMediaStreamDestination();
+    Tone.getDestination().connect(audioDest);
+    stream.addTrack(audioDest.stream.getAudioTracks()[0]);
     const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
       ? 'video/webm;codecs=vp9,opus' : 'video/webm';
     const rec = new MediaRecorder(stream, { mimeType });
@@ -988,12 +988,101 @@ document.getElementById('dlVideoBtn').addEventListener('click', async e=>{
     const a    = document.createElement('a');
     a.href = url; a.download = 'solresol.webm'; a.click();
     setTimeout(()=>URL.revokeObjectURL(url), 5000);
-    audioCtx.close();
+    Tone.getDestination().disconnect(audioDest);
   } catch(err){
     alert('Video export failed: '+err.message);
     console.error(err);
   } finally {
     btn.classList.remove('working'); btn.textContent = '⬇ Video';
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIDEO (LIVE) — canvas-capture with real-time SVG rendering
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById('dlVideoLiveBtn').addEventListener('click', async e=>{
+  e.stopPropagation();
+  const btn = document.getElementById('dlVideoLiveBtn');
+  if(btn.classList.contains('working')) return;
+  if(!SEQ.length){ alert('Nothing to play'); return; }
+  btn.classList.add('working'); btn.textContent = '⏳ Recording…';
+  try {
+    const bpm      = parseInt(document.getElementById('tempo').value,10);
+    const beat     = 60/bpm;
+    const W=900, H=540;
+    const canvas   = document.createElement('canvas');
+    canvas.width=W; canvas.height=H;
+    const ctx2d    = canvas.getContext('2d');
+    const stream   = canvas.captureStream(30);
+
+    const captureCtx = Tone.getContext().rawContext;
+    const audioDest  = captureCtx.createMediaStreamDestination();
+    Tone.getDestination().connect(audioDest);
+    stream.addTrack(audioDest.stream.getAudioTracks()[0]);
+
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+      ? 'video/webm;codecs=vp9,opus' : 'video/webm';
+    const rec = new MediaRecorder(stream, { mimeType });
+    const chunks = [];
+    rec.ondataavailable = ev => { if(ev.data.size) chunks.push(ev.data); };
+
+    await ensureAudio();
+    rec.start(100);
+
+    const staffEl = document.getElementById('staff');
+
+    for(let i=0; i<SEQ.length; i++){
+      const item = SEQ[i];
+      const col  = COLOR[item.syl];
+      const bg   = bgFor(col);
+      ctx2d.fillStyle = bg; ctx2d.fillRect(0,0,W,H);
+
+      // Draw staff SVG
+      const svgStr = new XMLSerializer().serializeToString(staffEl);
+      const svgBlob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
+      const svgUrl  = URL.createObjectURL(svgBlob);
+      await new Promise(res=>{
+        const img = new Image();
+        img.onload = ()=>{ ctx2d.drawImage(img, 20, 50, W-40, 200); URL.revokeObjectURL(svgUrl); res(); };
+        img.onerror = ()=>{ URL.revokeObjectURL(svgUrl); res(); };
+        img.src = svgUrl;
+      });
+
+      // Word labels
+      ctx2d.textAlign='center'; ctx2d.font='20px Georgia';
+      PHRASE.forEach((w, wi)=>{
+        const x = 60 + wi * (W-60)/Math.max(PHRASE.length,1);
+        ctx2d.fillStyle = wi===item.wi ? '#fff' : '#555';
+        ctx2d.fillText(w.english, x, H-80);
+        if(!w.unknown){
+          ctx2d.font='14px Georgia';
+          ctx2d.fillStyle = wi===item.wi ? col : '#444';
+          ctx2d.fillText(w.solresol.join(' '), x, H-58);
+          ctx2d.font='20px Georgia';
+        }
+      });
+
+      // Current syl big
+      ctx2d.font='bold 52px Georgia'; ctx2d.fillStyle=col; ctx2d.textAlign='center';
+      ctx2d.fillText(item.syl, W/2, H-10);
+
+      instrument.triggerAttackRelease(NOTE_PITCH[item.syl], beat*0.85);
+      await new Promise(r=>setTimeout(r, beat*1000));
+    }
+    await new Promise(r=>setTimeout(r, beat*1000));
+    rec.stop();
+    await new Promise(r=>{ rec.onstop=r; });
+    Tone.getDestination().disconnect(audioDest);
+
+    const blob = new Blob(chunks, {type:mimeType});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href=url; a.download='solresol-live.webm'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+  } catch(err){
+    alert('Live video export failed: '+err.message); console.error(err);
+  } finally {
+    btn.classList.remove('working'); btn.textContent='⬇ Video (Live)';
   }
 });
 

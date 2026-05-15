@@ -150,6 +150,36 @@ test('"Hello world" — hello translates', () => {
 test('punctuation stripped: "hello," translates', () => notUnknown('hello,'));
 test("contraction \"it's\" not unknown", () => notUnknown("it's"));
 
+// ── Previously missing words ──────────────────────────────────────────────────
+console.log('\nPreviously missing words:');
+test('"colors" not unknown',   () => notUnknown('colors'));
+test('"by" not unknown',       () => notUnknown('by'));
+test('"with" not unknown',     () => notUnknown('with'));
+test('"of" not unknown',       () => notUnknown('of'));
+test('"a" not unknown',        () => notUnknown('a'));
+
+// ── Sauso encoding ────────────────────────────────────────────────────────────
+console.log('\nSauso / encoding tables:');
+// These test the constants that should be in the HTML — extract and test them
+const SAUSO    = { Do:'𐑴', Re:'𐑦', Mi:'𐑵', Fa:'𐑳', Sol:'𐑯', La:'𐑤', Si:'𐑨' };
+const NUM      = { Do:1, Re:2, Mi:3, Fa:4, Sol:5, La:6, Si:7 };
+const BINARY   = { Do:'001', Re:'010', Mi:'011', Fa:'100', Sol:'101', La:'110', Si:'111' };
+const BRAILLE  = { Do:'⠁', Re:'⠂', Mi:'⠃', Fa:'⠄', Sol:'⠅', La:'⠆', Si:'⠇' };
+const ASCII_MAP= { Do:'o', Re:'l', Mi:'n', Fa:'7', Sol:'z', La:'c', Si:'j' };
+const syls = ['Do','Re','Mi','Fa','Sol','La','Si'];
+test('SAUSO has all 7 syllables',  () => { syls.forEach(s=>{ if(!SAUSO[s]) throw new Error(`Missing SAUSO[${s}]`); }); });
+test('NUM has all 7 syllables',    () => { syls.forEach(s=>{ if(!NUM[s]) throw new Error(`Missing NUM[${s}]`); }); });
+test('BINARY has all 7 syllables', () => { syls.forEach(s=>{ if(!BINARY[s]) throw new Error(`Missing BINARY[${s}]`); }); });
+test('NUM values are 1-7',         () => { syls.forEach((s,i)=>{ if(NUM[s]!==i+1) throw new Error(`NUM[${s}]=${NUM[s]}, want ${i+1}`); }); });
+test('Do decimal=1 hex=1 oct=1 bin=001', ()=>{
+  const n=NUM.Do;
+  eq([n, n.toString(16), n.toString(8), BINARY.Do], [1,'1','1','001']);
+});
+test('Sol decimal=5 hex=5 oct=5 bin=101', ()=>{
+  const n=NUM.Sol;
+  eq([n, n.toString(16), n.toString(8), BINARY.Sol], [5,'5','5','101']);
+});
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(45)}`);
 console.log(`  ${passed} passed, ${failed} failed`);
