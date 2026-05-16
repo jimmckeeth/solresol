@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="40"
+   height="30"
+   version="1.1"
+   id="svg12"
+   sodipodi:docname="la-symbol.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="3.2575758"
+     inkscape:cx="52.339535"
+     inkscape:cy="38.832558"
+     inkscape:window-width="2256"
+     inkscape:window-height="1398"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12" />
+  <defs
+     id="defs12" />
+  <g
+     id="g20"
+     transform="translate(-265,-7.7980442)">
+    <ellipse
+       id="path4075"
+       style="fill:#0088bf"
+       cx="285"
+       cy="22.798044"
+       rx="15"
+       ry="10" />
+    <path
+       d="m 285,30.298044 a 7.5,7.5 0 0 1 -6.49519,-3.75 7.5,7.5 0 0 1 0,-7.5 7.5,7.5 0 0 1 6.49519,-3.75"
+       id="path5336"
+       style="fill:none;stroke:#ffffff;stroke-width:3;stroke-linecap:round;stroke-dasharray:none" />
+  </g>
+</svg>

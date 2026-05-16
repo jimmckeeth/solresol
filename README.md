@@ -45,29 +45,27 @@ index.html?text=What+is+your+name&instrument=piano&tempo=72
 
 ## Color System
 
-| Syllable | Note | Color   |
-|----------|------|---------|
-| Do       | C4   | Red     |
-| Re       | D4   | Orange  |
-| Mi       | E4   | Yellow  |
-| Fa       | F4   | Green   |
-| Sol      | G4   | Blue    |
-| La       | A4   | Indigo  |
-| Si       | B4   | Violet  |
+| Syllable | Note | Color   | Symbol |
+|----------|------|---------|--------|
+| Do       | C4   | Red     | ![1-do-symbol](media/1-do-red-symbol.svg) |
+| Re       | D4   | Orange  | ![2-re-symbol](media/2-re-orange-symbol.svg) |
+| Mi       | E4   | Yellow  | ![3-mi-symbol](media/3-mi-yellow-symbol.svg) |
+| Fa       | F4   | Green   | ![4-fa-symbol](media/4-fa-green-symbol.svg) |
+| Sol      | G4   | Blue | ![5-sol-symbol](media/5-sol-blue-symbol.svg) |
+| La       | A4   | Indigo | ![6-la-symbol](media/6-la-indigo-symbol.svg) |
+| Si       | B4   | Violet  | ![7-si-symbol](media/7-si-violet-symbol.svg) |
 
 ## Technical Notes
 
 - **Single file** — `index.html` (~200 KB, ~8 KB gzipped dictionary data)
-- **Tone.js** (v14) for audio synthesis and Salamander piano samples
+- **[Tone.js](https://tonejs.github.io/)** (v14) for audio synthesis and [Salamander piano samples](https://github.com/Tonejs/audio/tree/master/salamander) 
 - **No build step** — plain HTML, CSS, and vanilla JavaScript
 - **localStorage** — instrument, tempo, and text persist across sessions
+  - Clear local storage: `localStorage.clear()`
+
 - **OfflineAudioContext** for WAV export (instrument synth only; sampler export uses PolySynth fallback)
 - **MediaRecorder API** for WebM video export (Chrome/Edge; Firefox may vary)
 
-## Dictionary
+---
 
-The Solresol dictionary is embedded inline from the [MishaKlopukh/solresol-language](https://github.com/MishaKlopukh/solresol-language) corpus, reverse-mapped from Solresol→English to English→Solresol. Common function words (the, is, what, etc.) use hand-curated overrides for accuracy.
-
-## License
-
-MIT
+[AGPL](LICENSE.md) | [Credits](CREDITS.md)

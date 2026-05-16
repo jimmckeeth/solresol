@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1400"
+   height="822"
+   version="1.1"
+   viewBox="0 0 1400 822"
+   id="svg49"
+   sodipodi:docname="Solresol_words.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   inkscape:export-filename="Solresol_words.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs49" />
+  <sodipodi:namedview
+     id="namedview49"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="0.96087381"
+     inkscape:cx="601.5358"
+     inkscape:cy="371.01646"
+     inkscape:window-width="2256"
+     inkscape:window-height="1398"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g14" />
+  <style
+     id="style1">.do {
+    stroke: #ff0000;
+  }
+  .re {
+    stroke: #ff9400;
+  }
+  .mi {
+    stroke: #ffe700;
+  }
+  .fa {
+    stroke: #00ff01;
+  }
+  .sol {
+    stroke: #00e4ff;
+  }
+  .la {
+    stroke: #000dff;
+  }
+  .si {
+    stroke: #bc00ff;
+  }
+  text
+  {
+    stroke-opacity:0.3;
+    font-size: 17.3px;
+
+    line-height:normal;
+    font-family:'Liberation Sans Narrow';
+    text-decoration-color:#000000;
+    white-space:pre;
+    fill:#000000;
+    fill-opacity:1;
+    stroke-width:5px;
+    paint-order:stroke fill markers;
+    stop-color:#000000;
+  }</style>
+  <g
+     transform="translate(-63 -196)"
+     display="none"
+     id="g1">
+    <path
+       id="a"
+       d="m428 80-38 37"
+       display="inline"
+       fill="none"
+       stroke="#bc00ff"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="5" />
+    <path
+       id="h"
+       transform="scale(1,-1)"
+       d="m360-72a19 19 0 0 1-16-9.4 19 19 0 0 1 0-19 19 19 0 0 1 16-9.4"
+       display="inline"
+       fill="none"
+       stroke="#000dff"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="5" />
+    <path
+       id="b"
+       d="m312 92h-38"
+       display="inline"
+       fill="none"
+       stroke="#00e4ff"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="5" />
+    <path
+       id="f"
+       d="m244 110-38-37"
+       fill="none"
+       stroke="#00ff01"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="5" />
+    <path
+       id="c"
+       transform="scale(-1,1)"
+       d="m-177 101a19 19 0 0 1 19-19 19 19 0 0 1 19 19"
+       display="inline"
+       fill="none"
+       stroke="#ffe700"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="5" />
+    <path
+       id="e"
+       d="m109 77v38"
+       display="inline"
+       fill="none"
+       stroke="#ff9400"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="5" />
+    <circle
+       id="d"
+       transform="scale(-1,1)"
+       cx="-61"
+       cy="95"
+       r="19"
+       display="inline"
+       fill="none"
+       stroke="#f00"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="5" />
+    <path
+       id="g"
+       d="m492 100h-27"
+       display="inline"
+       fill="none"
+       stroke="#000"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="5" />
+  </g>
+  <g
+     transform="translate(240,-250)"
+     id="g28">
+    <g
+       transform="translate(-75 -209)"
+       stroke-width=".34"
+       id="g27">
+      <g
+         transform="matrix(2.9 0 0 2.9 320 -891)"
+         id="g7">
+        <g
+           transform="translate(33 562)"
+           id="g3">
+          <use
+             transform="translate(-242 25)"
+             xlink:href="#a"
+             id="use1" />
+          <use
+             transform="translate(-331 17)"
+             xlink:href="#g"
+             id="use2" />
+          <use
+             transform="translate(39 27)"
+             xlink:href="#e"
+             id="use3" />
+        </g>
+        <g
+           transform="translate(-43 439)"
+           id="g6">
+          <text
+             x="155.24915"
+             y="260.15253"
+             xml:space="preserve"
+             id="text3"
+             style="fill:#ffffff;fill-opacity:1"><tspan
+               x="155.24915"
+               y="260.15253"
+               stroke-width="1.7px"
+               text-anchor="middle"
+               id="tspan3"
+               style="fill:#ffffff;fill-opacity:1">December</tspan></text>
+          <text
+             x="149.86531"
+             y="245.71288"
+             stroke-width="1.7px"
+             xml:space="preserve"
+             id="text6"
+             style="fill:#ffffff;fill-opacity:1"><tspan
+               class="re"
+               x="149.86531"
+               y="245.71288"
+               id="tspan4"
+               style="fill:#ffffff;fill-opacity:1">re</tspan><tspan
+               class="re"
+               id="tspan5"
+               style="fill:#ffffff;fill-opacity:1">re</tspan><tspan
+               class="si"
+               id="tspan6"
+               style="fill:#ffffff;fill-opacity:1">si</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 791 551)"
+         id="g10">
+        <use
+           transform="matrix(.5 0 0 .66 40 83)"
+           stroke-width=".59"
+           xlink:href="#d"
+           id="use7" />
+        <use
+           transform="translate(-101 34)"
+           stroke-width=".34"
+           xlink:href="#c"
+           id="use8" />
+        <use
+           transform="translate(-459 16)"
+           stroke-width=".34"
+           xlink:href="#g"
+           id="use9" />
+        <use
+           transform="translate(-324 25)"
+           stroke-width=".34"
+           xlink:href="#h"
+           id="use10" />
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 413 199)"
+         id="g14">
+        <text
+           x="56.593369"
+           y="245.71288"
+           stroke-width="1.7px"
+           xml:space="preserve"
+           id="text13"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             class="la"
+             x="56.593369"
+             y="245.71288"
+             id="tspan10"
+             style="fill:#ffffff;fill-opacity:1">la</tspan><tspan
+             class="la"
+             id="tspan11"
+             style="fill:#ffffff;fill-opacity:1">la</tspan><tspan
+             class="mi"
+             id="tspan12"
+             style="fill:#ffffff;fill-opacity:1">mi</tspan><tspan
+             class="do"
+             id="tspan13"
+             style="fill:#ffffff;fill-opacity:1">do</tspan></text>
+        <text
+           x="83.156143"
+           y="260.15253"
+           xml:space="preserve"
+           id="text14"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             x="83.156143"
+             y="260.15253"
+             stroke-width="1.7px"
+             text-anchor="middle"
+             id="tspan14"
+             style="fill:#ffffff;fill-opacity:1">printshop</tspan></text>
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -471 679)"
+         id="g17">
+        <use
+           transform="matrix(.66 0 0 1 507 -78)"
+           stroke-width=".42"
+           xlink:href="#d"
+           id="use14" />
+        <use
+           transform="translate(237 -94)"
+           stroke-width=".34"
+           xlink:href="#b"
+           id="use15" />
+        <use
+           transform="translate(82 -82)"
+           stroke-width=".34"
+           xlink:href="#a"
+           id="use16" />
+        <use
+           transform="translate(295 -65)"
+           stroke-width=".34"
+           xlink:href="#c"
+           id="use17" />
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -918 1.8)"
+         id="g21">
+        <text
+           x="531.6355"
+           y="260.15253"
+           xml:space="preserve"
+           id="text17"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             x="531.6355"
+             y="260.15253"
+             stroke-width="1.7px"
+             text-anchor="middle"
+             id="tspan17"
+             style="fill:#ffffff;fill-opacity:1">experience</tspan></text>
+        <text
+           x="502.94632"
+           y="245.71288"
+           stroke-width="1.7px"
+           xml:space="preserve"
+           id="text21"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             class="mi"
+             x="502.94632"
+             y="245.71288"
+             id="tspan18"
+             style="fill:#ffffff;fill-opacity:1">mi</tspan><tspan
+             class="si"
+             id="tspan19"
+             style="fill:#ffffff;fill-opacity:1">si</tspan><tspan
+             class="sol"
+             id="tspan20"
+             style="fill:#ffffff;fill-opacity:1">sol</tspan><tspan
+             class="do"
+             id="tspan21"
+             style="fill:#ffffff;fill-opacity:1">do</tspan></text>
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -168 488)"
+         id="g23">
+        <use
+           transform="translate(184 -69)"
+           stroke-width=".34"
+           xlink:href="#f"
+           id="use21" />
+        <use
+           transform="matrix(.78 0 0 .61 299 -24)"
+           stroke-width=".5"
+           xlink:href="#d"
+           id="use22" />
+        <use
+           transform="translate(-36 -74)"
+           stroke-width=".34"
+           xlink:href="#a"
+           id="use23" />
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -649 -172)"
+         id="g26">
+        <text
+           x="439.42203"
+           y="260.15253"
+           xml:space="preserve"
+           id="text23"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             x="439.42203"
+             y="260.15253"
+             stroke-width="1.7px"
+             text-anchor="middle"
+             id="tspan23"
+             style="fill:#ffffff;fill-opacity:1">accomplish</tspan></text>
+        <text
+           x="432.76608"
+           y="245.71288"
+           stroke-width="1.7px"
+           xml:space="preserve"
+           id="text26"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             class="do"
+             x="432.76608"
+             y="245.71288"
+             id="tspan24"
+             style="fill:#ffffff;fill-opacity:1">do</tspan><tspan
+             class="si"
+             id="tspan25"
+             style="fill:#ffffff;fill-opacity:1">si</tspan><tspan
+             class="fa"
+             id="tspan26"
+             style="fill:#ffffff;fill-opacity:1">fa</tspan></text>
+      </g>
+    </g>
+  </g>
+  <g
+     transform="translate(12 13)"
+     stroke-width=".34"
+     id="g49">
+    <g
+       transform="translate(-75 -209)"
+       id="g44">
+      <g
+         transform="matrix(2.9 0 0 2.9 -388 734)"
+         id="g30">
+        <use
+           transform="translate(-67 -35)"
+           xlink:href="#h"
+           id="use28" />
+        <use
+           transform="translate(117 -63)"
+           xlink:href="#c"
+           id="use29" />
+        <use
+           transform="translate(147 -76)"
+           xlink:href="#e"
+           id="use30" />
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -374 116)"
+         id="g33">
+        <text
+           x="218.10072"
+           y="260.15253"
+           xml:space="preserve"
+           id="text30"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             x="218.10072"
+             y="260.15253"
+             stroke-width="1.7px"
+             text-anchor="middle"
+             id="tspan30"
+             style="fill:#ffffff;fill-opacity:1">give</tspan></text>
+        <text
+           x="188.30646"
+           y="245.71288"
+           stroke-width="1.7px"
+           xml:space="preserve"
+           id="text33"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             class="re"
+             x="188.30646"
+             y="245.71288"
+             id="tspan31"
+             style="fill:#ffffff;fill-opacity:1">re</tspan><tspan
+             class="mi"
+             id="tspan32"
+             style="fill:#ffffff;fill-opacity:1">mi</tspan><tspan
+             class="la"
+             id="tspan33"
+             style="fill:#ffffff;fill-opacity:1">la</tspan></text>
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -12 -406)"
+         id="g35">
+        <use
+           transform="translate(-79 260)"
+           xlink:href="#f"
+           id="use33" />
+        <use
+           transform="translate(-223 252)"
+           xlink:href="#a"
+           id="use34" />
+        <use
+           transform="translate(-1.4 260)"
+           xlink:href="#f"
+           id="use35" />
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -122 -406)"
+         id="g38">
+        <text
+           x="129.85962"
+           y="364.59387"
+           xml:space="preserve"
+           id="text35"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             x="129.85962"
+             y="364.59387"
+             stroke-width="1.7px"
+             text-anchor="middle"
+             id="tspan35"
+             style="fill:#ffffff;fill-opacity:1">want</tspan></text>
+        <text
+           x="110.39218"
+           y="350.15421"
+           stroke-width="1.7px"
+           xml:space="preserve"
+           id="text38"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             class="fa"
+             x="110.39218"
+             y="350.15421"
+             id="tspan36"
+             style="fill:#ffffff;fill-opacity:1">fa</tspan><tspan
+             class="si"
+             id="tspan37"
+             style="fill:#ffffff;fill-opacity:1">si</tspan><tspan
+             class="fa"
+             id="tspan38"
+             style="fill:#ffffff;fill-opacity:1">fa</tspan></text>
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -105 -352)"
+         id="g40">
+        <use
+           transform="translate(-114 166)"
+           xlink:href="#b"
+           id="use38" />
+        <use
+           transform="translate(88 181)"
+           xlink:href="#e"
+           id="use39" />
+        <use
+           transform="translate(-77 203)"
+           xlink:href="#b"
+           id="use40" />
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -732 -269)"
+         id="g43">
+        <text
+           x="323.48145"
+           y="260.15253"
+           xml:space="preserve"
+           id="text40"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             x="323.48145"
+             y="260.15253"
+             stroke-width="1.7px"
+             text-anchor="middle"
+             id="tspan40"
+             style="fill:#ffffff;fill-opacity:1">language</tspan></text>
+        <text
+           x="299.4281"
+           y="245.71288"
+           stroke-width="1.7px"
+           xml:space="preserve"
+           id="text43"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             class="sol"
+             x="299.4281"
+             y="245.71288"
+             id="tspan41"
+             style="fill:#ffffff;fill-opacity:1">sol</tspan><tspan
+             class="re"
+             id="tspan42"
+             style="fill:#ffffff;fill-opacity:1">re</tspan><tspan
+             class="sol"
+             id="tspan43"
+             style="fill:#ffffff;fill-opacity:1">sol</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(-75 -209)"
+       id="g48">
+      <g
+         transform="matrix(2.9 0 0 2.9 341 245)"
+         id="g45">
+        <use
+           transform="translate(-264 -56)"
+           xlink:href="#b"
+           id="use44" />
+        <use
+           transform="translate(-382 -81)"
+           xlink:href="#a"
+           id="use45" />
+      </g>
+      <g
+         transform="matrix(2.9 0 0 2.9 -889 -428)"
+         id="g47">
+        <text
+           x="386.28793"
+           y="260.15253"
+           xml:space="preserve"
+           id="text45"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             x="386.28793"
+             y="260.15253"
+             stroke-width="1.7px"
+             text-anchor="middle"
+             id="tspan45"
+             style="fill:#ffffff;fill-opacity:1">mister</tspan></text>
+        <text
+           x="372.06497"
+           y="245.71288"
+           stroke-width="1.7px"
+           xml:space="preserve"
+           id="text47"
+           style="fill:#ffffff;fill-opacity:1"><tspan
+             class="si"
+             x="372.06497"
+             y="245.71288"
+             id="tspan46"
+             style="fill:#ffffff;fill-opacity:1">si</tspan><tspan
+             class="sol"
+             id="tspan47"
+             style="fill:#ffffff;fill-opacity:1">sol</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>
