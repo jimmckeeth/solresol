@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Solresol Visualizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital@1&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -227,11 +229,10 @@ body.playing .pause-hint { opacity: 1; }
   gap: 0;
 }
 .script-syl {
-  font-family: 'Georgia', serif;
-  font-style: italic;
-  font-size: 4.5rem;
-  line-height: 1;
-  letter-spacing: 0.02em;
+  font-family: 'Noto Serif', 'Segoe UI Historic', serif;
+  font-size: 5.5rem;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
 }
 .encoding-col {
   position: fixed;
@@ -245,17 +246,18 @@ body.playing .pause-hint { opacity: 1; }
   user-select: none;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.4rem;
 }
 .enc-row {
   display: flex;
-  gap: 0.5rem;
-  font-size: 0.7rem;
+  gap: 0.7rem;
+  font-size: 1.4rem;
   color: #888;
   font-family: monospace;
+  align-items: baseline;
 }
-.enc-label { color: #555; min-width: 3.5rem; text-align: right; }
-.enc-val   { color: #777; }
+.enc-label { color: #444; min-width: 4.5rem; text-align: right; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.enc-val   { color: #666; }
 </style>
 </head>
 <body>
@@ -312,6 +314,7 @@ const COLOR = {
 };
 const NOTE_Y  = { Do:130, Re:123, Mi:115, Fa:108, Sol:100, La:93, Si:85 };
 const NOTE_PITCH = { Do:'C4', Re:'D4', Mi:'E4', Fa:'F4', Sol:'G4', La:'A4', Si:'B4' };
+const SAUSO    = { Do:'𐑴', Re:'𐑦', Mi:'𐑵', Fa:'𐑳', Sol:'𐑯', La:'𐑤', Si:'𐑨' };
 const NUM      = { Do:1, Re:2, Mi:3, Fa:4, Sol:5, La:6, Si:7 };
 const BINARY   = { Do:'001', Re:'010', Mi:'011', Fa:'100', Sol:'101', La:'110', Si:'111' };
 const BRAILLE  = { Do:'⠁', Re:'⠂', Mi:'⠃', Fa:'⠄', Sol:'⠅', La:'⠆', Si:'⠇' };
@@ -595,7 +598,7 @@ function activateNote(i,on){
     const sausoEl = document.getElementById('sausoDisplay');
     if (sausoEl) {
       sausoEl.innerHTML = wordSylItems.map(s =>
-        `<div class="script-syl" style="color:${COLOR[s.syl]}55">${s.syl}</div>`
+        `<div class="script-syl" style="color:${COLOR[s.syl]}55">${SAUSO[s.syl]}</div>`
       ).join('');
       sausoEl.style.opacity = '1';
     }
