@@ -687,7 +687,8 @@ function advance(){
   if(cur>=SEQ.length){ finish(); return; }
 
   const entry=SEQ[cur];
-  if(entry.wi!==curWord){
+  const wordChange = entry.wi!==curWord;
+  if(wordChange){
     if(curWord>=0) activateWord(curWord,false);
     curWord=entry.wi;
     activateWord(curWord,true);
@@ -696,8 +697,14 @@ function advance(){
   const ph=document.getElementById('playhead');
   if(ph){ ph.style.transform=`translateX(${entry.x}px)`; ph.setAttribute('opacity','0.55'); }
 
-  activateNote(cur,true);
-  if(playing) timer=setTimeout(advance,noteDur());
+  // Add a half-beat rest before the first note of each new word
+  const rest = wordChange && cur>0 ? noteDur()*0.5 : 0;
+  if(rest>0){
+    if(playing) timer=setTimeout(()=>{ activateNote(cur,true); if(playing) timer=setTimeout(advance,noteDur()); }, rest);
+  } else {
+    activateNote(cur,true);
+    if(playing) timer=setTimeout(advance,noteDur());
+  }
 }
 
 function finish(){
