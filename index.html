@@ -123,6 +123,19 @@ body.playing .input-area {
 .word-group.unknown .eng  { color: #333; font-size: 1.4rem; }
 .word-group.unknown .syls { font-size: 0.75rem; }
 .sep { color: #333; }
+.shav-row {
+  font-family: 'Noto Serif', 'Segoe UI Historic', serif;
+  font-size: 1.1rem;
+  margin-top: 2px;
+  opacity: 0.45;
+  font-style: normal;
+}
+.word-group.active .shav-row { opacity: 0.7; }
+.shav-glyph { transition: text-shadow 0.2s, font-size 0.15s; }
+.shav-glyph.current {
+  font-size: 1.55em;
+  text-shadow: 0 0 14px currentColor, 0 0 30px currentColor, 0 0 55px currentColor;
+}
 
 /* ── Staff ── */
 .staff-wrap {
@@ -250,14 +263,14 @@ body.playing .pause-hint { opacity: 1; }
 }
 .enc-row {
   display: flex;
-  gap: 0.7rem;
-  font-size: 1.4rem;
+  gap: 0.8rem;
+  font-size: 1.7rem;
   color: #888;
   font-family: monospace;
   align-items: baseline;
 }
-.enc-label { color: #444; min-width: 4.5rem; text-align: right; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
-.enc-val   { color: #666; }
+.enc-label { color: #666; min-width: 4rem; text-align: right; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: Georgia, serif; }
+.enc-val   { color: #777; }
 </style>
 </head>
 <body>
@@ -314,7 +327,7 @@ const COLOR = {
 };
 const NOTE_Y  = { Do:130, Re:123, Mi:115, Fa:108, Sol:100, La:93, Si:85 };
 const NOTE_PITCH = { Do:'C4', Re:'D4', Mi:'E4', Fa:'F4', Sol:'G4', La:'A4', Si:'B4' };
-const SAUSO    = { Do:'𐑴', Re:'𐑦', Mi:'𐑵', Fa:'𐑳', Sol:'𐑯', La:'𐑤', Si:'𐑨' };
+const SAUSO    = { Do:'𐑴', Re:'𐑦', Mi:'𐑵', Fa:'𐑘', Sol:'𐑯', La:'𐑤', Si:'𐑢' };
 const NUM      = { Do:1, Re:2, Mi:3, Fa:4, Sol:5, La:6, Si:7 };
 const BINARY   = { Do:'001', Re:'010', Mi:'011', Fa:'100', Sol:'101', La:'110', Si:'111' };
 const BRAILLE  = { Do:'⠁', Re:'⠂', Mi:'⠃', Fa:'⠄', Sol:'⠅', La:'⠆', Si:'⠇' };
@@ -448,6 +461,8 @@ function buildPhrase() {
 
     const sylsEl = document.createElement('div');
     sylsEl.className = 'syls';
+    const shavEl = document.createElement('div');
+    shavEl.className = 'syls shav-row';
 
     if (word.solresol.length) {
       word.solresol.forEach((syl, si) => {
@@ -455,6 +470,9 @@ function buildPhrase() {
           const sep = document.createElement('span');
           sep.className='sep'; sep.textContent='·';
           sylsEl.appendChild(sep);
+          const sep2 = document.createElement('span');
+          sep2.className='sep shav-sep'; sep2.textContent=' ';
+          shavEl.appendChild(sep2);
         }
         const span = document.createElement('span');
         span.className='syl';
@@ -462,6 +480,13 @@ function buildPhrase() {
         span.textContent=syl;
         span.style.color = COLOR[syl]||'#888';
         sylsEl.appendChild(span);
+
+        const shav = document.createElement('span');
+        shav.className='syl shav-glyph';
+        shav.id=`shav-${wi}-${si}`;
+        shav.textContent = SAUSO[syl]||'';
+        shav.style.color = COLOR[syl]||'#888';
+        shavEl.appendChild(shav);
       });
     } else {
       const q = document.createElement('span');
@@ -471,6 +496,7 @@ function buildPhrase() {
 
     g.appendChild(eng);
     g.appendChild(sylsEl);
+    if (word.solresol.length) g.appendChild(shavEl);
     el.appendChild(g);
   });
 }
@@ -577,7 +603,8 @@ function activateNote(i,on){
   const lbl =document.getElementById(`lbl-${i}`);
   if(!note) return;
   const {syl,wi,si}=SEQ[i];
-  const sylEl=document.getElementById(`syl-${wi}-${si}`);
+  const sylEl =document.getElementById(`syl-${wi}-${si}`);
+  const shavEl=document.getElementById(`shav-${wi}-${si}`);
   if(on){
     note.setAttribute('opacity','1');
     note.setAttribute('rx', NOTE_RX+8);
@@ -590,16 +617,14 @@ function activateNote(i,on){
     lbl.setAttribute('opacity','1');
     lbl.setAttribute('font-size','14');
     lbl.setAttribute('font-weight','bold');
-    if(sylEl) sylEl.classList.add('current');
+    if(sylEl)  sylEl.classList.add('current');
+    if(shavEl) shavEl.classList.add('current');
     document.body.style.backgroundColor=bgFor(COLOR[syl]);
     triggerNote(syl);
-    // Update script display: current word's syllables in their rainbow colors
-    const wordSylItems = SEQ.filter(s => s.wi === wi);
+    // Left background: single glyph for current syllable
     const sausoEl = document.getElementById('sausoDisplay');
     if (sausoEl) {
-      sausoEl.innerHTML = wordSylItems.map(s =>
-        `<div class="script-syl" style="color:${COLOR[s.syl]}99">${SAUSO[s.syl]}</div>`
-      ).join('');
+      sausoEl.innerHTML = `<div class="script-syl" style="color:${COLOR[syl]}55">${SAUSO[syl]}</div>`;
       sausoEl.style.opacity = '1';
     }
     // Update encoding display (current syllable)
@@ -627,7 +652,8 @@ function activateNote(i,on){
     lbl.setAttribute('opacity','0.7');
     lbl.setAttribute('font-size','11');
     lbl.setAttribute('font-weight','normal');
-    if(sylEl) sylEl.classList.remove('current');
+    if(sylEl)  sylEl.classList.remove('current');
+    if(shavEl) shavEl.classList.remove('current');
   }
 }
 
