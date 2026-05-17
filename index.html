@@ -230,7 +230,7 @@ body.playing .pause-hint { opacity: 1; }
 }
 .script-syl {
   font-family: 'Noto Serif', 'Segoe UI Historic', serif;
-  font-size: 5.5rem;
+  font-size: 11rem;
   line-height: 0.95;
   letter-spacing: 0.01em;
 }
@@ -598,7 +598,7 @@ function activateNote(i,on){
     const sausoEl = document.getElementById('sausoDisplay');
     if (sausoEl) {
       sausoEl.innerHTML = wordSylItems.map(s =>
-        `<div class="script-syl" style="color:${COLOR[s.syl]}55">${SAUSO[s.syl]}</div>`
+        `<div class="script-syl" style="color:${COLOR[s.syl]}99">${SAUSO[s.syl]}</div>`
       ).join('');
       sausoEl.style.opacity = '1';
     }
@@ -608,10 +608,7 @@ function activateNote(i,on){
       const n = NUM[syl];
       encEl.innerHTML = [
         ['Dec', n],
-        ['Hex', n.toString(16).toUpperCase()],
-        ['Oct', n.toString(8)],
         ['Bin', BINARY[syl]],
-        ['ASCII', ASCII_MAP[syl]],
         ['Braille', BRAILLE[syl]],
       ].map(([lbl,val]) =>
         `<div class="enc-row"><span class="enc-label">${lbl}</span><span class="enc-val">${val}</span></div>`
