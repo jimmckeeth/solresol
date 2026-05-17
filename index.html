@@ -384,6 +384,9 @@ let PHRASE = translate('What is your name');
 let SEQ    = [];
 let cur=-1, curWord=-1, playing=false, timer=null;
 
+// Pre-populate SEQ synchronously so Play works even before async INIT finishes
+buildPhrase(); buildStaff();
+
 // ─────────────────────────────────────────────────────────────────────────────
 // AUDIO
 // ─────────────────────────────────────────────────────────────────────────────
@@ -733,6 +736,9 @@ function togglePlay(){
     document.getElementById('playBtn').textContent='▶  Play';
     return;
   }
+  // Guard: if SEQ empty (shouldn't happen, but race-condition safety), rebuild
+  if(!SEQ.length) buildStaff();
+  if(!SEQ.length) return; // nothing to play — all words unknown
   // Always restart from note 0 — avoids stale-cursor bugs after text changes
   cur = -1; curWord = -1;
   SEQ.forEach((_,i)=>activateNote(i,false));
