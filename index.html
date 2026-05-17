@@ -740,6 +740,7 @@ function togglePlay(){
   const ph = document.getElementById('playhead');
   if(ph) ph.setAttribute('opacity','0');
   playing=true;
+  playStartTime = Date.now();
   document.body.classList.add('playing');
   document.getElementById('playBtn').textContent='⏸  Pause';
   pushStateToURL();
@@ -801,12 +802,9 @@ function scheduleTranslate(){
 // ─────────────────────────────────────────────────────────────────────────────
 // EVENTS
 // ─────────────────────────────────────────────────────────────────────────────
-let lastPlayClick = 0;
+let playStartTime = 0;
 document.getElementById('playBtn').addEventListener('click', async e=>{
   e.stopPropagation();
-  const now = Date.now();
-  if (now - lastPlayClick < 400) return;
-  lastPlayClick = now;
   clearTimeout(translateTimer);
   if(document.getElementById('engInput').value.trim() !== lastTranslatedText) runTranslate();
   await ensureAudio(); togglePlay();
@@ -820,7 +818,10 @@ document.getElementById('instrument').addEventListener('change', function(e){
 document.getElementById('tempo').addEventListener('input', function(){
   document.getElementById('bpmVal').textContent=this.value; savePrefs();
 });
-document.body.addEventListener('click', e=>{ if(playing && !e.target.closest('.controls, .input-area')) togglePlay(); });
+document.body.addEventListener('click', e=>{
+  if(playing && !e.target.closest('.controls, .input-area') && Date.now() - playStartTime > 600)
+    togglePlay();
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // URL CONFIG — push state on play, auto-play when config present in URL
