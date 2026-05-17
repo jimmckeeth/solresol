@@ -438,13 +438,13 @@ async function setInstrument(name, silent=false){
   if(!silent) savePrefs();
 }
 
-function triggerNote(syl){
+function triggerNote(syl, mult=1){
   if(!audioReady || !instrumentLoaded) return;
   const pitch = NOTE_PITCH[syl];
   if(!pitch) return;
   const isSampler = !!SAMPLER_BASES[document.getElementById('instrument').value];
-  const dur = isSampler ? noteDur()/1000*1.6 : Math.max(0.1, noteDur()/1000*0.95);
-  instrument.triggerAttackRelease(pitch, dur);
+  const base = isSampler ? noteDur()/1000*1.6 : Math.max(0.1, noteDur()/1000*0.95);
+  instrument.triggerAttackRelease(pitch, base * mult);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -599,7 +599,7 @@ function bgFor(hex,a=0.28){
 // ─────────────────────────────────────────────────────────────────────────────
 // NOTE / WORD ACTIVATION
 // ─────────────────────────────────────────────────────────────────────────────
-function activateNote(i,on){
+function activateNote(i,on,mult=1){
   const note=document.getElementById(`note-${i}`);
   const halo=document.getElementById(`halo-${i}`);
   const stem=document.getElementById(`stem-${i}`);
@@ -623,7 +623,7 @@ function activateNote(i,on){
     if(sylEl)  sylEl.classList.add('current');
     if(shavEl) shavEl.classList.add('current');
     document.body.style.backgroundColor=bgFor(COLOR[syl]);
-    triggerNote(syl);
+    triggerNote(syl, mult);
     // Left background: single glyph for current syllable
     const sausoEl = document.getElementById('sausoDisplay');
     if (sausoEl) {
@@ -697,14 +697,11 @@ function advance(){
   const ph=document.getElementById('playhead');
   if(ph){ ph.style.transform=`translateX(${entry.x}px)`; ph.setAttribute('opacity','0.55'); }
 
-  // Add a half-beat rest before the first note of each new word
-  const rest = wordChange && cur>0 ? noteDur()*0.5 : 0;
-  if(rest>0){
-    if(playing) timer=setTimeout(()=>{ activateNote(cur,true); if(playing) timer=setTimeout(advance,noteDur()); }, rest);
-  } else {
-    activateNote(cur,true);
-    if(playing) timer=setTimeout(advance,noteDur());
-  }
+  // Hold the last note of each word longer for natural musical phrasing
+  const isLastInWord = cur === SEQ.length-1 || SEQ[cur+1].wi !== entry.wi;
+  const mult = isLastInWord ? 1.75 : 1;
+  activateNote(cur, true, mult);
+  if(playing) timer=setTimeout(advance, noteDur()*mult);
 }
 
 function finish(){
@@ -872,10 +869,11 @@ document.getElementById('dlAudioBtn').addEventListener('click', async e=>{
   if(btn.classList.contains('working')) return;
   btn.classList.add('working'); btn.textContent = '⏳ Rendering…';
   try {
-    // Calculate total duration
+    // Calculate total duration (matching live playback: last note of each word held 1.75x)
     const bpm   = parseInt(document.getElementById('tempo').value,10);
     const beat  = 60/bpm;
-    const total = SEQ.length * beat + beat; // pad 1 beat at end
+    const seqMults = SEQ.map((item,idx)=>(idx===SEQ.length-1||SEQ[idx+1].wi!==item.wi)?1.75:1);
+    const total = seqMults.reduce((s,m)=>s+beat*m,0) + beat; // pad 1 beat at end
     const sr    = 44100;
     const offCtx = new OfflineAudioContext(2, Math.ceil(total*sr), sr);
     const offReverb = new Tone.Reverb({ decay:2.5, wet:0.22 });
@@ -892,10 +890,11 @@ document.getElementById('dlAudioBtn').addEventListener('click', async e=>{
       await offRev.ready;
       offInst.connect(offRev);
       offRev.toDestination();
-      const noteDur = beat * 0.85;
+      let t = 0;
       SEQ.forEach((item, idx)=>{
-        const t = idx * beat;
-        offInst.triggerAttackRelease(NOTE_PITCH[item.syl], noteDur, t);
+        const mult = seqMults[idx];
+        offInst.triggerAttackRelease(NOTE_PITCH[item.syl], beat*0.85*mult, t);
+        t += beat * mult;
       });
     }, total).then(buf=>{
       // Encode to WAV
