@@ -1,0 +1,8 @@
+Syllable,Meaning,French IPA,English IPA,Note,Frequency,Color,RGB,Number,Binary,ASCII,Shavian,Name,Oct,Dec,Hex,HTML
+Do,"no, not, neither, nor",/do/,/doʊ/,C4,261.6Hz,Red,c40233,1,0001,o,𐑴,oak,202164,66676,0x10474,&#66676;
+Re,"and, as well as",/ʁɛ/,/ɹeɪ/,D4,293.7Hz,Orange,e16b1a,2,0010,l,𐑦,if,202146,66662,0x10466,&#66662;
+Mi,"or, or even",/mi/,/miː/,E4,329.6Hz,Yellow,eac100,3,0011,n,𐑵,ooze,202165,66677,0x10475,&#66677;
+Fa,to,/fa/,/fɑː/,F4,349.2Hz,Green,00a368,4,0100,\,𐑘,yea,202130,66648,0x10458,&#66648;
+Sol,if,/sɔl/,/soʊl/,G4,392.0Hz,Blue,00b2b0,5,0101,z,𐑯,nun,202157,66671,0x1046F,&#66671;
+La,the,/la/,/lɑː/,A4,440.0Hz,Indigo,0088bf,6,0110,c,𐑤,loll,202144,66660,0x10464,&#66660;
+Si/Ti,"yes, okay, gladly, agreed",/si/,/siː/,B4,493.9Hz,Violet,624579,7,0111,j,𐑢,woe,202142,66658,0x10462,&#66658;
