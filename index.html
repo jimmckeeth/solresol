@@ -1153,23 +1153,27 @@ document.getElementById('dlVideoLiveBtn').addEventListener('click', async e=>{
   document.getElementById('tempo').value = tempo;
   document.getElementById('bpmVal').textContent = tempo;
 
-  // Restore instrument UI (audio not started yet, just set select value)
+  // Restore instrument UI
   const instName = urlInst || prefs.instrument || 'piano';
   document.getElementById('instrument').value = instName;
-  // Kick off sampler load immediately so it's ready when user hits play
-  await setInstrument(instName, true);
 
-  // Restore / set text — URL param wins
+  // Restore text and rebuild phrase/staff BEFORE the sampler await so the
+  // correct SEQ is in place the moment the user can interact with the page.
   const text = urlText ?? prefs.text ?? 'What is your name';
   document.getElementById('engInput').value = text;
   lastTranslatedText = text.trim();
-
   PHRASE = translate(text);
   buildPhrase();
   buildStaff();
 
-  // Auto-play if URL had config params (shareable link)
-  if(hasURLConfig){
+  // Kick off sampler load; phrase is already correct, so user can click play
+  // at any time and the SEQ won't be clobbered when the sampler finishes.
+  await setInstrument(instName, true);
+
+  // Auto-play if URL had config params (shareable link).
+  // Guard !playing: if the user already clicked Play while the sampler was
+  // loading, don't call togglePlay() again — that would immediately pause them.
+  if(hasURLConfig && !playing){
     await ensureAudio();
     togglePlay();
   }
