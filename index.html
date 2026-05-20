@@ -684,7 +684,7 @@ function noteDur() { return 60000/bpm(); }
 function advance(){
   if(cur>=0) activateNote(cur,false);
   cur++;
-  if(cur>=SEQ.length){ finish(); return; }
+  if(cur>=SEQ.length){ console.log('[solresol] advance→finish: cur='+cur+' SEQ.length='+SEQ.length); finish(); return; }
 
   const entry=SEQ[cur];
   const wordChange = entry.wi!==curWord;
@@ -735,6 +735,7 @@ function doReset(){
 
 function togglePlay(){
   if(playing){
+    console.log('[solresol] togglePlay→PAUSE', new Error().stack);
     clearTimeout(timer); playing=false;
     document.body.classList.remove('playing');
     document.getElementById('playBtn').textContent='▶  Play';
@@ -751,6 +752,7 @@ function togglePlay(){
   if(ph) ph.setAttribute('opacity','0');
   playing=true;
   playStartTime = Date.now();
+  console.log('[solresol] togglePlay→START SEQ.length='+SEQ.length, new Error().stack);
   document.body.classList.add('playing');
   document.getElementById('playBtn').textContent='⏸  Pause';
   pushStateToURL();
@@ -786,6 +788,7 @@ function runTranslate(){
   const text = document.getElementById('engInput').value.trim();
   lastTranslatedText = text;
 
+  if(playing) console.log('[solresol] runTranslate called while playing!', new Error().stack);
   clearTimeout(timer);
   playing  = false;
   document.body.classList.remove('playing');
@@ -829,6 +832,7 @@ document.getElementById('tempo').addEventListener('input', function(){
   document.getElementById('bpmVal').textContent=this.value; savePrefs();
 });
 document.body.addEventListener('click', e=>{
+  console.log('[solresol] body click: playing='+playing+' target='+e.target.id+'/'+e.target.className+' age='+(Date.now()-playStartTime)+'ms');
   if(playing && !e.target.closest('.controls, .input-area') && Date.now() - playStartTime > 600)
     togglePlay();
 });
