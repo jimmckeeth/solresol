@@ -1,0 +1,19 @@
+{
+  "name": "solresol-translator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-contained Solresol translator and playback app.",
+  "main": "solresol-translator.js",
+  "scripts": {
+    "build": "node syncdict.js",
+    "sync": "node syncdict.js",
+    "sync:check": "node syncdict.js --check",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "solresol",
+    "translator",
+    "constructed-language"
+  ],
+  "license": "AGPL-3.0-or-later"
+}

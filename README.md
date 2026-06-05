@@ -33,6 +33,14 @@ Open `index.html` directly — no server required. It is entirely self-contained
 3. Click anywhere to pause; controls reappear.
 4. Use the instrument selector and BPM slider to customize the sound.
 
+### Development
+
+- `node test.js` or `npm test` — run translator regression tests and generated-output checks.
+- `node syncdict.js` or `npm run build` — regenerate `index.html` and `solresol-translator.js` from the shared translator core.
+- `node syncdict.js --check` or `npm run sync:check` — fail when generated translator outputs are stale.
+
+See [TESTING.md](TESTING.md) for the full test/build workflow and [TRANSLATION.md](TRANSLATION.md) for standalone library reuse.
+
 ### Sharing
 
 Click **🔗 Copy URL** (or just press Play) to get a URL that encodes the current text, instrument, and tempo. Anyone opening that URL will see the same phrase and start playing automatically.
